@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Etiquetas QR - Complementarios SST</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; }
+        h1 { text-align: center; color: #1b5e20; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #555; margin-top: 0; margin-bottom: 20px; }
+        .no-print { text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .btn-print { background-color: #1b5e20; color: white; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-print:hover { background-color: #2e7d32; }
+        .filter-select { padding: 10px 15px; font-size: 15px; border-radius: 8px; border: 2px solid #1b5e20; font-weight: bold; color: #1b5e20; background: white; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; }
+        .etiqueta { background: white; border: 2px dashed #1b5e20; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); page-break-inside: avoid; }
+        .etiqueta h3 { margin: 0 0 5px 0; color: #1b5e20; font-size: 18px; }
+        .etiqueta .ubicacion { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 10px; min-height: 35px; display: flex; align-items: center; justify-content: center; }
+        .etiqueta img { width: 140px; height: 140px; margin: 5px 0; }
+        .etiqueta .tipo { font-size: 11px; color: #666; margin-top: 5px; font-weight: bold; text-transform: uppercase; }
+        @media print { .no-print { display: none; } body { background: white; padding: 0; } .grid-container { gap: 10px; } .etiqueta { border: 1px solid #999; box-shadow: none; } }
+    </style>
+</head>
+<body>
+
+    <h1>ETIQUETAS QR - INSPECCIÓN DE COMPLEMENTARIOS</h1>
+    <p class="subtitle">FALCON FARMS DE COLOMBIA S.A – FINCA TORREMOLINOS | Escanea con la cámara del celular para abrir la ficha.</p>
+
+    <div class="no-print">
+        <select id="filtro-categoria" class="filter-select" onchange="renderEtiquetas()">
+            <option value="">Todas las categorías (27 etiquetas)</option>
+            <option value="CAMILLAS RIGIDAS">CAMILLAS RIGIDAS (10)</option>
+            <option value="SALIDAS DE EMERGENCIA">SALIDAS DE EMERGENCIA (5)</option>
+            <option value="KIT DE SALVAMENTO EN RESERVORIOS">KIT DE SALVAMENTO EN RESERVORIOS (5)</option>
+            <option value="CILINDROS DE GAS">CILINDROS DE GAS (4)</option>
+            <option value="HIDRANTES DE APOYO CONTRA INCENDIO">HIDRANTES DE APOYO CONTRA INCENDIO (2)</option>
+            <option value="DUCHA DE EMERGENCIA">DUCHA DE EMERGENCIA (1)</option>
+        </select>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir Etiquetas</button>
+    </div>
+
+    <div class="grid-container" id="etiquetas-grid"></div>
+
+    <script>
+        // Ajusta este enlace con el nombre exacto de tu repositorio en GitHub Pages
+        const BASE_URL = "https://softwareproduccion0-afk.github.io/complementarios/";
+
+        const masterComplementaries = [
+            // CAMILLAS RIGIDAS
+            { id: "CAM-001", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 1" },
+            { id: "CAM-002", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 10" },
+            { id: "CAM-003", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 16" },
+            { id: "CAM-004", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 22" },
+            { id: "CAM-005", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 25" },
+            { id: "CAM-006", categoria: "CAMILLAS RIGIDAS", ubicacion: "BLOQUE 27" },
+            { id: "CAM-007", categoria: "CAMILLAS RIGIDAS", ubicacion: "PORTERIA" },
+            { id: "CAM-008", categoria: "CAMILLAS RIGIDAS", ubicacion: "CONSULTORIO" },
+            { id: "CAM-009", categoria: "CAMILLAS RIGIDAS", ubicacion: "CASINO" },
+            { id: "CAM-010", categoria: "CAMILLAS RIGIDAS", ubicacion: "POSTCOSECHA" },
+            // SALIDAS DE EMERGENCIA
+            { id: "SAL-001", categoria: "SALIDAS DE EMERGENCIA", ubicacion: "COSINA CASINO PRINCIPAL" },
+            { id: "SAL-002", categoria: "SALIDAS DE EMERGENCIA", ubicacion: "ALMACEN GENERAL" },
+            { id: "SAL-003", categoria: "SALIDAS DE EMERGENCIA", ubicacion: "OFICINA PRINCIPAL" },
+            { id: "SAL-004", categoria: "SALIDAS DE EMERGENCIA", ubicacion: "POSCOSECHA N°1" },
+            { id: "SAL-005", categoria: "SALIDAS DE EMERGENCIA", ubicacion: "POSCOSECHA N°2" },
+            // KIT DE SALVAMENTO EN RESERVORIOS
+            { id: "RES-001", categoria: "KIT DE SALVAMENTO EN RESERVORIOS", ubicacion: "PISCINA FRENTE BOMBA MIRFE 1" },
+            { id: "RES-002", categoria: "KIT DE SALVAMENTO EN RESERVORIOS", ubicacion: "BOMBA MIRFE 1" },
+            { id: "RES-003", categoria: "KIT DE SALVAMENTO EN RESERVORIOS", ubicacion: "TALLER DE MTTO" },
+            { id: "RES-004", categoria: "KIT DE SALVAMENTO EN RESERVORIOS", ubicacion: "BLOQUE 22" },
+            { id: "RES-005", categoria: "KIT DE SALVAMENTO EN RESERVORIOS", ubicacion: "DARSENA BLOQUE 10" },
+            // CILINDROS DE GAS
+            { id: "GAS-001", categoria: "CILINDROS DE GAS", ubicacion: "CASINO" },
+            { id: "GAS-002", categoria: "CILINDROS DE GAS", ubicacion: "FRENTE A LA BOMBA MIRFE 1" },
+            { id: "GAS-003", categoria: "CILINDROS DE GAS", ubicacion: "COMEDOR AUXILIAR BLOQUE 1" },
+            { id: "GAS-004", categoria: "CILINDROS DE GAS", ubicacion: "BLOQUE 27" },
+            // HIDRANTES DE APOYO CONTRA INCENDIO
+            { id: "HID-001", categoria: "HIDRANTES DE APOYO CONTRA INCENDIO", ubicacion: "RUTA A PREPARACION DE SOLUCIONES" },
+            { id: "HID-002", categoria: "HIDRANTES DE APOYO CONTRA INCENDIO", ubicacion: "EMPAQUE" },
+            // DUCHA DE EMERGENCIA
+            { id: "DUC-001", categoria: "DUCHA DE EMERGENCIA", ubicacion: "ALMACEN GENERAL" }
+        ];
+
+        function renderEtiquetas() {
+            const contenedor = document.getElementById('etiquetas-grid');
+            const filtro = document.getElementById('filtro-categoria').value;
+            contenedor.innerHTML = '';
+
+            const lista = filtro
+                ? masterComplementaries.filter(item => item.categoria === filtro)
+                : masterComplementaries;
+
+            lista.forEach(item => {
+                const enlaceWeb = `${BASE_URL}?id=${encodeURIComponent(item.id)}`;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(enlaceWeb)}`;
+
+                const tarjeta = document.createElement('div');
+                tarjeta.className = 'etiqueta';
+                tarjeta.innerHTML = `
+                    <h3>${item.id}</h3>
+                    <div class="ubicacion">${item.ubicacion}</div>
+                    <img src="${qrUrl}" alt="QR ${item.id}">
+                    <div class="tipo">${item.categoria}</div>
+                `;
+                contenedor.appendChild(tarjeta);
+            });
+        }
+
+        renderEtiquetas();
+    </script>
+</body>
+</html>
