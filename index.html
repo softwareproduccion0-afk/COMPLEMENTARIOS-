@@ -572,11 +572,11 @@
                         category: c.categoria,
                         location: c.ubicacion,
                         responsible: "",
-                        status: "OK",
+                        status: "",
                         lastInspection: "",
                         inspector: "",
                         checklist: items.reduce((acc, curr) => {
-                            acc[curr] = { result: 'Cumple', obs: 'OK' };
+                            acc[curr] = { result: 'Cumple', obs: '' };
                             return acc;
                         }, {}),
                         photos: [],
