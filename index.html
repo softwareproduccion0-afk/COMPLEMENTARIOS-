@@ -437,7 +437,7 @@
                 "El forro se encuentra en buen estado?"
             ],
             "SALIDAS DE EMERGENCIA": [
-                "Cuenta con señalización de Salida",
+                "Cuenta con señalización de Salida fotoluminiscente?",
                 "No tiene candado",
                 "Se encuentran despejadas",
                 "Cuenta con luces de emergencia?",
@@ -572,11 +572,11 @@
                         category: c.categoria,
                         location: c.ubicacion,
                         responsible: "",
-                        status: "",
+                        status: "OK",
                         lastInspection: "",
                         inspector: "",
                         checklist: items.reduce((acc, curr) => {
-                            acc[curr] = { result: 'Cumple', obs: '' };
+                            acc[curr] = { result: 'Cumple', obs: 'OK' };
                             return acc;
                         }, {}),
                         photos: [],
